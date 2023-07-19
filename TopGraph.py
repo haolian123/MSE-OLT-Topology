@@ -42,7 +42,7 @@ class TopologyDiagram:
         # 设置图的布局方向为从上到下
         graph.attr(rankdir='LR', ranksep=leafs)
         # 显示图形
-        graph.render( view=False)
+        graph.render( view=False,cleanup=True)
 
 
     
@@ -119,32 +119,41 @@ class TopologyDiagram:
 
             # print(OLT_dict.items())
 
-            #拼装同一前缀名的OLT
-            for key,values in OLT_dict.items():
-                value=''
+            # 拼装同一前缀名的OLT
+            for key, values in OLT_dict.items():
+                value = ''  # 初始化拼接后的字符串
                 for i in range(len(values)):
-                    value=value+values[i]
-                    if(i!=len(values)-1):
-                        value+=', '
-                    if (i+1)%3==0 and i!=0:
-                        value=value+'\n'
+                    if i == 0:
+                        value = value + values[i]  # 将第一个值直接添加到字符串中
+                    else:
+                        # 获取OLT名称，并添加到字符串中
+                        value = value + self.__get_olt_name(values[i], pre=False)  
+                        
+                    if (i != len(values) - 1):
+                        value += ', '  # 如果不是最后一个值，则添加逗号和空格
+                    if (i + 1) % 3 == 0 and i != 0:
+                        value = value + '\n'  # 每三个值换行一次
                 if mse_name not in Tree.keys():
-                    Tree[mse_name]=dict()
-                Tree[mse_name][str(olt_cnt)]=value
-                olt_cnt+=1
+                    Tree[mse_name] = dict()  # 如果mse_name不在Tree字典中，则添加一个空字典
+                Tree[mse_name][str(olt_cnt)] = value  # 将拼接后的字符串添加到Tree字典中
+                olt_cnt += 1  # 增加OLT计数器
+
         for key,values in Tree.items():
             tree_item={key:values}
             # print(tree_item)
-            self.__showTreemap(tree_item,f'MSE-OLT/{key}/{key}.gv')
+            self.__showTreemap(tree_item,f'MSE-OLT/{key}')
 
-    #得到olt的前缀中文名
-    def __get_olt_name(self,olt_name):
-        index=olt_name.find('O')
-        if index !=-1:
-            res_name=olt_name[:index]
-        else:
-            res_name=olt_name
-        return res_name
+
+    def __get_olt_name(self, olt_name, pre=True,split_char='O'):
+        index = olt_name.find(split_char)  # 查找字符串中第一个出现的字母'O'的索引位置
+        if index != -1:  # 如果找到了字母'O'
+            if pre:  # 如果需要前缀名
+                res_name = olt_name[:index]  # 获取字母'O'之前的部分作为前缀名
+            else:  # 如果需要后缀名
+                res_name = olt_name[index:]  # 获取字母'O'及其后面的部分作为后缀名
+        else:  # 如果没有找到字母'O'
+            res_name = olt_name  # 则整个字符串作为前缀名或后缀名
+        return res_name  # 返回前缀名或后缀名
 
 
     
