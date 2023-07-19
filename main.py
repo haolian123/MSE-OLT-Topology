@@ -72,7 +72,6 @@ def _sub_plot(g, tree, inc):
 
 
 data=pd.read_excel("揭阳OLT设备安全评估2023-05-29.xlsx",sheet_name=2)
-
 data=data[['Z端设备中文名称','A端设备中文名称']]
 data.sort_values(by='Z端设备中文名称')
 data=data.drop_duplicates(subset=['A端设备中文名称'])
@@ -81,6 +80,14 @@ data=data.dropna(subset=['Z端设备中文名称'])
 
 D=data.groupby('Z端设备中文名称')
 
+#得到olt的前缀中文名
+def get_olt_name(olt_name):
+    index=olt_name.find('O')
+    if index !=-1:
+        res_name=olt_name[:index]
+    else:
+        res_name=olt_name
+    return res_name
 
 #得到所有MSE下所有的OLT
 Tree={}
@@ -90,15 +97,36 @@ key_names
 for mse_name in key_names:
     olt_names=list(D.get_group(mse_name)['A端设备中文名称'])
     olt_cnt=1
+    OLT_dict={}
     for olt_name in olt_names:
+        #提取OLT前缀
+        olt_name_key=get_olt_name(olt_name)
+
+        if olt_name_key not in OLT_dict.keys():
+            OLT_dict[olt_name_key]=[]
+        OLT_dict[olt_name_key].append(olt_name)
+    # print(OLT_dict.items())
+
+    for key,values in OLT_dict.items():
+        value=''
+        for i in range(len(values)):
+            value=value+values[i]
+            if(i!=len(values)-1):
+                value+=', '
+            if (i+1)%3==0 and i!=0:
+                value=value+'\n'
         if mse_name not in Tree.keys():
             Tree[mse_name]=dict()
-        Tree[mse_name][str(olt_cnt)]=olt_name 
+        Tree[mse_name][str(olt_cnt)]=value
         olt_cnt+=1
+    
+
+
+    
 
 for key,values in Tree.items():
     tree_item={key:values}
-    print(tree_item)
+    # print(tree_item)
     plot_model(tree_item,f'MSE-OLT/{key}/{key}.gv')
 
 
