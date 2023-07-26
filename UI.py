@@ -77,7 +77,7 @@ class GUI:
 
         # 创建一个文本框，用于显示程序运行结果，设置为不可编辑状态
 
-        self.show_text = tk.Text(self.window, height=20, width=77, fg="#06EB00", bg='black', state='disabled', font=('', 10))
+        self.show_text = tk.Text(self.window, height=20, width=77, fg="#FF00FF", bg='black', state='disabled', font=('', 12))
         self.show_text.place(x=2, y=120)
 
 
@@ -98,6 +98,7 @@ class GUI:
     子表序号：待转化的数据子表在数据文件中的序号，编号从1开始。
     MSE字段名：数据子表中MSE设备的字段名(列名)。
     OLT字段名：数据子表中OLT设备的字段名(列名)。
+
 [*] 请选择需要处理的数据文件和子表在数据文件里的序号，并运行。
 '''
         # self.show_text.config(state='normal')
@@ -115,12 +116,17 @@ class GUI:
 
     #运行按钮
     def run(self):
-        self.insert_show_text(self.show_text,self.sheet_name.get())
-        self.insert_show_text(self.show_text,self.MSE_col_names.get())
-        self.insert_show_text(self.show_text,self.OLT_col_names.get())
-        self.insert_show_text(self.show_text,self.datefile_path.get())
-        TD.MSE_to_OLT(self.datefile_path.get(),sheet_name=int(self.sheet_name.get())-1,MSE_name=self.MSE_col_names.get(),OLT_name=self.OLT_col_names.get())
-
+        # self.insert_show_text(self.show_text,self.sheet_name.get())
+        # self.insert_show_text(self.show_text,self.MSE_col_names.get())
+        # self.insert_show_text(self.show_text,self.OLT_col_names.get())
+        # self.insert_show_text(self.show_text,self.datefile_path.get())
+        # self.insert_show_text(self.show_text,'[*] 正在处理...')
+        
+        try:
+            TD.MSE_to_OLT(self.datefile_path.get(),sheet_name=int(self.sheet_name.get())-1,MSE_name=self.MSE_col_names.get(),OLT_name=self.OLT_col_names.get())
+            self.insert_show_text(self.show_text,'[*] 生成结果成功！')
+        except:
+            self.insert_show_text(self.show_text,'[*] 生成结果失败！')
 
 
 

@@ -170,7 +170,7 @@ class TopologyDiagram:
             tree_item={key:values}
             # print(tree_item)
            
-            self.__showTreemap(tree_item,f'{file_name}-MSE-OLT/{key}')
+            self.__showTreemap(tree_item,f'{file_name}/MSE-OLT/{key}')
         
     #生成MSE对应OLT所在地区的图
     @classmethod
@@ -188,7 +188,7 @@ class TopologyDiagram:
             MSE_area_tree['MSE地区'][key]=area_value
         
         
-        self.__showTreemap(MSE_area_tree,f'{file_path}-MSE对应OLT所在地区')
+        self.__showTreemap(MSE_area_tree,f'{file_path}/MSE对应OLT所在地区')
         
     #得到olt的中文名
     @classmethod
