@@ -5,6 +5,9 @@ import pandas as pd  # 引入 pandas
 import os
 from datetime import datetime
 
+from TopGraph import TopologyDiagram as TD
+
+
 class GUI:
     def __init__(self):
         # 创建一个窗口对象
@@ -26,6 +29,10 @@ class GUI:
         self.OLT_col_names=tk.StringVar()
         self.sheet_name=tk.StringVar()
 
+
+        self.MSE_col_names.set("Z端设备中文名称")
+        self.OLT_col_names.set("A端设备中文名称")
+        self.sheet_name.set("3")
         # 创建一个标签，显示"数据文件："
         self.datafile_label = tk.Label(self.window, text="数据文件：", font=('Arial', 13))
         self.datafile_label.place(x=5, y=8)
@@ -36,7 +43,7 @@ class GUI:
 
         # 创建一个按钮，点击后调用select_file函数，参数为1，用于选择数据文件
         # self.datafile_button = tk.Button(self.window, command=lambda: self.emailManager.select_file(1,self.datefile_path,self.show_text), text="选择数据文件")
-        self.datafile_button = tk.Button(self.window,  text="选择数据文件")
+        self.datafile_button = tk.Button(self.window, command=lambda: self.select_file(self.datefile_path,self.show_text), text="选择数据文件")
         self.datafile_button.place(x=350, y=8)
 
 
@@ -64,7 +71,7 @@ class GUI:
 
         # 创建一个按钮，点击后调用thread_run函数，用于运行程序
         # self.exec_button = tk.Button(self.window, text='运行', command=self.thread_run, font=('Arial', 13))
-        self.exec_button = tk.Button(self.window, text='运行', font=('Arial', 13))
+        self.exec_button = tk.Button(self.window, command=self.run, text='运行', font=('Arial', 13))
         self.exec_button.place(x=460, y=8)
 
 
@@ -98,7 +105,34 @@ class GUI:
         # 进入窗口的主循环
         self.window.mainloop()
 
+    #向文本框插入文本
     def insert_show_text(self,show_text,insert_text=''):
         show_text.config(state='normal')
+        if insert_text[-1]!='\n':
+            insert_text+='\n'
         show_text.insert('end',insert_text)
         show_text.config(state='disable')
+
+    #运行按钮
+    def run(self):
+        self.insert_show_text(self.show_text,self.sheet_name.get())
+        self.insert_show_text(self.show_text,self.MSE_col_names.get())
+        self.insert_show_text(self.show_text,self.OLT_col_names.get())
+        self.insert_show_text(self.show_text,self.datefile_path.get())
+        TD.MSE_to_OLT(self.datefile_path.get(),sheet_name=int(self.sheet_name.get())-1,MSE_name=self.MSE_col_names.get(),OLT_name=self.OLT_col_names.get())
+
+
+
+
+    #选择数据文件
+    def select_file(self,filePath,show_text):
+        #选择数据文件
+        
+        file_path = tk.filedialog.askopenfilename(title='请选择要处理的文件')
+        filePath.set(file_path) 
+        # show_text.config(state='normal')
+        # show_text.insert('end', '[*] 选择的数据文件为：' + file_path + '\n')
+        # show_text.config(state='disable')
+        self.insert_show_text(self.show_text,'[*] 选择的数据文件为：' + file_path + '\n')
+   
+        

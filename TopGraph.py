@@ -2,16 +2,18 @@
 from graphviz import Digraph
 import pandas as pd 
 import re
-
+import time
 
 class TopologyDiagram:
+    __root='0'
     def __init__(self) :
-        self.__root='0'
+        pass
 
 
     
     # 获取所有节点中最多子节点的叶节点
     # 定义一个函数，用于获取树中最大叶子节点数
+    @classmethod
     def __maxLeavesNums(self,tree):
         # 获取当前树的叶子节点数
         leaves_nums = len(tree.keys())
@@ -29,6 +31,7 @@ class TopologyDiagram:
     
 
     # 定义一个函数，用于绘制树状图
+    @classmethod
     def __showTreemap(self,tree, name):
         # 创建一个有向图对象
         graph = Digraph("G", filename=name, format='png', strict=False)
@@ -51,6 +54,7 @@ class TopologyDiagram:
 
     
     # 定义一个辅助函数，用于递归绘制子树
+    @classmethod
     def __drawTreemapHelper(self,graph, tree, inc):
         # 全局变量，用于记录当前节点的编号
         # 获取子树的根节点
@@ -78,6 +82,7 @@ class TopologyDiagram:
                 graph.edge(inc, self.__root, str(i),fontname="Microsoft YaHei")
 
     #主接口
+    @classmethod
     def MSE_to_OLT(self,file_path,sheet_name=2,MSE_name='Z端设备中文名称',OLT_name='A端设备中文名称'):
 
         #读取文件
@@ -156,17 +161,20 @@ class TopologyDiagram:
                     Tree[mse_name] = dict()  # 如果mse_name不在Tree字典中，则添加一个空字典
                 Tree[mse_name][str(olt_cnt)] = value  # 将拼接后的字符串添加到Tree字典中
                 olt_cnt += 1  # 增加OLT计数器
-
+        file_name=time.strftime('%Y-%m-%d-%H', time.localtime())
         #生成MSE下的区域图
-        self.__MSE_area(MSE_area)
+        self.__MSE_area(MSE_area,file_name)
         #生成MSE-OLT的拓扑图
+        
         for key,values in Tree.items():
             tree_item={key:values}
             # print(tree_item)
-            self.__showTreemap(tree_item,f'MSE-OLT/{key}')
+           
+            self.__showTreemap(tree_item,f'{file_name}-MSE-OLT/{key}')
         
     #生成MSE对应OLT所在地区的图
-    def __MSE_area(self,MSE_area):
+    @classmethod
+    def __MSE_area(self,MSE_area,file_path):
         MSE_area_tree={'MSE地区':{}}
         # print(MSE_area)
         for key,values in MSE_area.items():
@@ -180,9 +188,10 @@ class TopologyDiagram:
             MSE_area_tree['MSE地区'][key]=area_value
         
         
-        self.__showTreemap(MSE_area_tree,f'MSE对应OLT所在地区')
+        self.__showTreemap(MSE_area_tree,f'{file_path}-MSE对应OLT所在地区')
         
-
+    #得到olt的中文名
+    @classmethod
     def __get_olt_name(self, olt_name, pre=True,split_char='O'):
 
         index = olt_name.find(split_char)  # 查找字符串中第一个出现的字母'O'的索引位置
